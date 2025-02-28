@@ -4,8 +4,6 @@ import { UserType } from "../../../types/user.types.ts";
 import bcrypt from "bcryptjs";
 import jsonwebtoken from "jsonwebtoken";
 
-const SECRET_KEY = "ShantanuNitinFULLSTACKProject";
-
 const getLogin = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
@@ -21,7 +19,13 @@ const getLogin = async (req: Request, res: Response) => {
       res.status(400).json({ message: "Invalid credentials" });
       return;
     }
-    const token = jsonwebtoken.sign({ user }, SECRET_KEY, { expiresIn: "24h" });
+    const token = jsonwebtoken.sign(
+      { user },
+      process.env.JWT_SECRET as string,
+      {
+        expiresIn: "24h",
+      }
+    );
     res.status(200).json({ message: "Login successful", token, user });
   } catch (error) {
     console.error("Login error:", error);
