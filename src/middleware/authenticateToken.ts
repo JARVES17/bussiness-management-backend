@@ -8,47 +8,35 @@ declare module "express-serve-static-core" {
   }
 }
 
-// let tokenBlacklist: string[] = [];
-
-const invalidateToken = (req: Request, res: Response) => {
-  const token: string | undefined = req.headers["authorization"];
-  if (!token) return res.status(401).json({ error: "Unauthorized" });
-
-  // Add the token to the blacklist
-  //   tokenBlacklist.push(token);
-  //   return res.status(200).json({ success: true, message: "Logout successful" });
-};
-
-const authenticateToken = (
+const authenticateToken = async (
   req: Request,
   res: Response,
   next: NextFunction
-): Response | void => {
-  const authHeader: string | undefined = req.headers["authorization"];
-  const token: string | undefined = authHeader && authHeader.split(" ")[1];
+): Promise<void> => {
+  try {
+    const authHeader: string | undefined = req.headers["authorization"];
+    const token: string | undefined = authHeader && authHeader.split(" ")[1];
 
-  if (!token) {
-    return res
-      .status(401)
-      .json({ success: false, error: "Unauthorized: Token missing" });
-  }
-
-  //   if (tokenBlacklist.includes(token)) {
-  //     return res.status(403).json({
-  //       success: false,
-  //       error: "Unauthorized: Token has been invalidated",
-  //     });
-  //   }
-
-  jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => {
-    if (err) {
-      return res
-        .status(403)
-        .json({ success: false, error: "Unauthorized: Invalid token" });
+    if (!token) {
+      res
+        .status(401)
+        .json({ success: false, error: "Unauthorized: Token missing" });
+      return;
     }
-    req.user = user;
-    next();
-  });
+
+    jwt.verify(token, process.env.JWT_SECRET as string, (err, user) => {
+      if (err) {
+        res
+          .status(403)
+          .json({ success: false, error: "Unauthorized: Invalid token" });
+        return;
+      }
+      req.user = user;
+      next();
+    });
+  } catch (error) {
+    res.status(500).json({ success: false, error: "Internal Server Error" });
+  }
 };
 
-export { authenticateToken, invalidateToken };
+export { authenticateToken };
