@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
+import { handleError } from "../../utils/errorHandler.ts";
 
 const getUserProfile = (req: Request, res: Response): void => {
   try {
@@ -23,6 +24,13 @@ const getUserProfile = (req: Request, res: Response): void => {
     } else {
       res.status(500).json({ error: "Internal Server Error" });
     }
+  }
+};
+
+const getUpdateUserProfile = (req: Request, res: Response) => {
+  try {
+  } catch (error) {
+    handleError(res, error);
   }
 };
 
