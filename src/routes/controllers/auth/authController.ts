@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import userCollection from "../../../models/auth/authModules.ts";
+import userCollection from "../../../models/auth/authModels.ts";
 import { UserType } from "../../../types/user.types.ts";
 import bcrypt from "bcryptjs";
 import jsonwebtoken from "jsonwebtoken";

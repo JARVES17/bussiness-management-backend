@@ -1,5 +1,5 @@
 import express, { Request, Response } from "express";
-import connectDB from "./config/mangodb.ts";
+import connectDB from "./config/mongoDB.config.ts";
 import authRoutes from "./routes/auth/authRoutes.ts";
 import { config } from "dotenv";
 
