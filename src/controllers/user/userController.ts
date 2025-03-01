@@ -27,16 +27,14 @@ const getUserProfile = async (req: Request, res: Response) => {
       email: decoded.user.email,
     });
 
-    res
-      .status(200)
-      .json({
-        firstName: userObject?.firstName,
-        lastName: userObject?.lastName,
-        username: userObject?.username,
-        role: userObject?.role,
-        email: userObject?.email,
-        _id: userObject?._id,
-      });
+    res.status(200).json({
+      firstName: userObject?.firstName,
+      lastName: userObject?.lastName,
+      username: userObject?.username,
+      role: userObject?.role,
+      email: userObject?.email,
+      _id: userObject?._id,
+    });
   } catch (error) {
     handleError(res, error);
   }
@@ -55,4 +53,19 @@ const updateUserProfile = async (req: Request, res: Response) => {
   }
 };
 
-export { getUserProfile, updateUserProfile };
+const getAllUsers = async (req: Request, res: Response) => {
+  try {
+    const users: UserType[] = await userCollection.find().select("-password");
+
+    if (!users || users.length === 0) {
+      res.status(404).json({ message: "No users found" });
+      return;
+    }
+
+    res.status(200).json({ users });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export { getUserProfile, updateUserProfile, getAllUsers };
