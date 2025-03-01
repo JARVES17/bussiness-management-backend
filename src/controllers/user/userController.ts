@@ -68,4 +68,14 @@ const getAllUsers = async (req: Request, res: Response) => {
   }
 };
 
-export { getUserProfile, updateUserProfile, getAllUsers };
+const deleteUser = async (req: Request, res: Response) => {
+  try {
+    const { _id } = req.body;
+    await userCollection.deleteOne({ _id: _id });
+    res.status(200).json({ message: "user deleted" });
+  } catch (error) {
+    handleError(res, error);
+  }
+};
+
+export { getUserProfile, updateUserProfile, getAllUsers, deleteUser };
