@@ -1,8 +1,14 @@
 import { Request, Response } from "express";
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import { handleError } from "../../utils/errorHandler.ts";
+import { UserType } from "../../types/user.types.ts";
+import userCollection from "../../models/auth/authModels.ts";
 
-const getUserProfile = (req: Request, res: Response): void => {
+interface DecodedUserToken extends JwtPayload {
+  user: UserType;
+}
+
+const getUserProfile = async (req: Request, res: Response) => {
   try {
     const authHeader = req.headers["authorization"];
     const token = authHeader && authHeader.split(" ")[1];
@@ -12,26 +18,41 @@ const getUserProfile = (req: Request, res: Response): void => {
       return;
     }
 
-    const decoded: string | JwtPayload = jsonwebtoken.verify(
+    const decoded = jsonwebtoken.verify(
       token,
       process.env.JWT_SECRET as string
-    );
+    ) as DecodedUserToken; // Explicit type assertion
 
-    res.status(200).json({ decoded });
+    const userObject: UserType | null = await userCollection.findOne({
+      email: decoded.user.email,
+    });
+
+    res
+      .status(200)
+      .json({
+        firstName: userObject?.firstName,
+        lastName: userObject?.lastName,
+        username: userObject?.username,
+        role: userObject?.role,
+        email: userObject?.email,
+        _id: userObject?._id,
+      });
   } catch (error) {
-    if (error instanceof Error) {
-      res.status(400).json({ error: error.message });
-    } else {
-      res.status(500).json({ error: "Internal Server Error" });
-    }
+    handleError(res, error);
   }
 };
-
-const getUpdateUserProfile = (req: Request, res: Response) => {
+const updateUserProfile = async (req: Request, res: Response) => {
   try {
+    const { firstName, lastName, username, email }: UserType = req.body;
+    const updateU = await userCollection.findOneAndUpdate(
+      { email },
+      { firstName: firstName, lastName: lastName, username: username },
+      { new: true }
+    );
+    res.status(200).json({ updateU });
   } catch (error) {
     handleError(res, error);
   }
 };
 
-export { getUserProfile };
+export { getUserProfile, updateUserProfile };

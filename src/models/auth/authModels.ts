@@ -7,6 +7,7 @@ const userCollectionSchema = new mongoose.Schema(
     password: { type: String, require: true },
     firstName: { type: String },
     lastName: { type: String },
+    role: { type: Number },
   },
   { timestamps: true }
 );

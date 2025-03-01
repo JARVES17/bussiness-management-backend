@@ -5,4 +5,5 @@ export type UserType = {
   firstName?: string | undefined;
   lastName?: string | undefined;
   _id: string;
+  role?: number;
 };
